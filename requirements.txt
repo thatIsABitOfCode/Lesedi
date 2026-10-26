@@ -12,3 +12,6 @@ whitenoise==6.8.2
 gunicorn==23.0.0
 
 python-dotenv>=1.0,<2
+
+# PostgreSQL driver
+psycopg[binary]==3.2.3

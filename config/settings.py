@@ -86,20 +86,40 @@ TEMPLATES = [
 ]
 
 # --- Database -------------------------------------------------------------
-if os.environ.get("DATABASE_ENGINE", "sqlite") == "sqlite":
+# DATABASE_URL supports hosted PostgreSQL. Local SQLite and POSTGRES_* remain supported.
+DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
+if DATABASE_URL:
+    from urllib.parse import parse_qs, unquote, urlparse
+    parsed_database_url = urlparse(DATABASE_URL)
+    if parsed_database_url.scheme not in {"postgres", "postgresql"}:
+        raise ImproperlyConfigured("DATABASE_URL must use postgres:// or postgresql://.")
+    if not parsed_database_url.hostname or not parsed_database_url.path.lstrip("/"):
+        raise ImproperlyConfigured("DATABASE_URL must include a hostname and database name.")
+    query = parse_qs(parsed_database_url.query)
+    sslmode = query.get("sslmode", [os.environ.get("POSTGRES_SSLMODE", "require")])[0]
+    options = {"sslmode": sslmode} if sslmode else {}
+    DATABASES = {"default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": unquote(parsed_database_url.path.lstrip("/")),
+        "USER": unquote(parsed_database_url.username or ""),
+        "PASSWORD": unquote(parsed_database_url.password or ""),
+        "HOST": parsed_database_url.hostname,
+        "PORT": str(parsed_database_url.port or 5432),
+        "CONN_MAX_AGE": int(os.environ.get("DB_CONN_MAX_AGE", "0")),
+        "OPTIONS": options,
+    }}
+elif os.environ.get("DATABASE_ENGINE", "sqlite") == "sqlite":
     DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3"}}
 else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.environ.get("POSTGRES_DB", "lesedi"),
-            "USER": os.environ.get("POSTGRES_USER", "lesedi"),
-            "PASSWORD": os.environ.get("POSTGRES_PASSWORD", ""),
-            "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
-            "PORT": os.environ.get("POSTGRES_PORT", "5432"),
-            "CONN_MAX_AGE": 60,
-        }
-    }
+    DATABASES = {"default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("POSTGRES_DB", "lesedi"),
+        "USER": os.environ.get("POSTGRES_USER", "lesedi"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", ""),
+        "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
+        "PORT": os.environ.get("POSTGRES_PORT", "5432"),
+        "CONN_MAX_AGE": 60,
+    }}
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

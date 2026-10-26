@@ -1,2 +1,0 @@
-V1.6 root HTTP status: 200
-Anonymous SOS HTTP status: 302

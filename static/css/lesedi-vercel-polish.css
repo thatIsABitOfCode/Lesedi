@@ -1,0 +1,12 @@
+/* Additive LESEDI interaction polish; existing functionality and markup remain unchanged. */
+:root{--lesedi-fast:150ms;--lesedi-normal:220ms;--lesedi-focus:0 0 0 3px rgba(59,130,246,.30);--lesedi-hover-shadow:0 8px 24px rgba(15,23,42,.12)}
+:where(button,.btn,input[type=submit],input[type=button],a.button,[role=button]){transition:color var(--lesedi-fast) ease,background-color var(--lesedi-fast) ease,border-color var(--lesedi-fast) ease,box-shadow var(--lesedi-fast) ease,transform var(--lesedi-fast) ease}
+:where(button,.btn,input[type=submit],input[type=button],a.button,[role=button]):not(:disabled):not([aria-disabled=true]):hover{filter:brightness(.97);box-shadow:var(--lesedi-hover-shadow)}
+:where(button,.btn,input[type=submit],input[type=button],a.button,[role=button]):not(:disabled):not([aria-disabled=true]):active{transform:translateY(1px)}
+:where(button,.btn,input[type=submit],input[type=button],a.button,[role=button],a,input,select,textarea,summary):focus-visible{outline:2px solid #2563eb;outline-offset:3px;box-shadow:var(--lesedi-focus)}
+:where(input,select,textarea){transition:border-color var(--lesedi-fast) ease,box-shadow var(--lesedi-fast) ease}
+:where(input,select,textarea):focus{border-color:#3b82f6}
+:where(.card,.panel,.resource-card,.service-card,.dashboard-card){transition:box-shadow var(--lesedi-normal) ease,border-color var(--lesedi-normal) ease}
+:where(.card,.panel,.resource-card,.service-card,.dashboard-card):hover{box-shadow:var(--lesedi-hover-shadow)}
+:where(button,.btn,input[type=submit],input[type=button]):disabled,[aria-disabled=true]{cursor:not-allowed;filter:saturate(.65);box-shadow:none}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}

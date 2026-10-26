@@ -14,3 +14,14 @@ htmlcov/
 *.log
 .idea/
 .vscode/
+.env.*
+!.env.example
+backups/
+reports/
+.repair-backups/
+*.db
+*.dump
+*.sql
+private_storage/*
+!.gitkeep
+*.py[cod]

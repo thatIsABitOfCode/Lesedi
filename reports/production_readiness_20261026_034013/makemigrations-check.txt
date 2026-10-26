@@ -1,6 +1,0 @@
-Migrations for 'amani':
-  amani/migrations/0002_alter_listenerprofile_id_alter_storysummary_id_and_more.py
-    ~ Alter field id on listenerprofile
-    ~ Alter field id on storysummary
-    ~ Alter field id on supportconnection
-    ~ Alter field id on supportmessage

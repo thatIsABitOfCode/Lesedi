@@ -1,6 +1,0 @@
-lesedi-v16-worker-1 8000/tcp
-lesedi-v16-web-1 127.0.0.1:8016->8000/tcp
-lesedi-v16-beat-1 8000/tcp
-lesedi-v16-db-1 5432/tcp
-lesedi-v16-redis-1 6379/tcp
-smart-community-db 0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp

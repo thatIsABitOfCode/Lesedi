@@ -1,6 +1,0 @@
-NAME                  IMAGE               COMMAND                  SERVICE   CREATED      STATUS                PORTS
-lesedi-v16-beat-1     lesedi-v16-beat     "celery -A config be…"   beat      2 days ago   Up 2 days             8000/tcp
-lesedi-v16-db-1       postgres:16         "docker-entrypoint.s…"   db        2 days ago   Up 2 days (healthy)   5432/tcp
-lesedi-v16-redis-1    redis:7             "docker-entrypoint.s…"   redis     2 days ago   Up 2 days (healthy)   6379/tcp
-lesedi-v16-web-1      lesedi-v16-web      "python manage.py ru…"   web       2 days ago   Up 2 days             127.0.0.1:8016->8000/tcp
-lesedi-v16-worker-1   lesedi-v16-worker   "celery -A config wo…"   worker    2 days ago   Up 2 days             8000/tcp
