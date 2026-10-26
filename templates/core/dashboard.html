@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<div class="dashboard-intro"><span class="eyebrow">YOUR SPACE · YOUR PACE</span><h1>Hello, {{ user.display_name }}</h1><p>Welcome back. Your choices, your safety, your way forward.</p></div>
+<section class="card amani-feature"><div><span class="eyebrow">AMANI · HUMAN FIRST</span><h2>Sometimes, you just need to be heard.</h2><p>Connect with a compassionate, approved volunteer. Keep the same listener over time. AI is optional while you wait.</p><a class="btn" href="{% url 'amani:home' %}">Enter Amani →</a></div></section>
+{% if not is_survivor %}
+<p class="notice">Your account role does not include personal safety planning. You can use the community feed{% if is_moderator %} and the moderation queue{% endif %} below.</p>
+{% else %}
+  {% if open_activation %}
+  <p class="notice"><strong>Guardian Mode is active.</strong> <a href="{% url 'guardian:page' %}">Open it</a> to see what has happened.</p>
+  {% endif %}
+  <div class="grid">
+    <section class="card">
+      <h2>Your plan</h2>
+      <p>Version {{ plan.version }}. {{ responder_count }} responder{{ responder_count|pluralize }} chosen, {{ contact_count }} contact{{ contact_count|pluralize }} in your circle.</p>
+      <p>{% if health_total %}{{ health_total }} suggestion{{ health_total|pluralize }} to strengthen it{% if health_high %} ({{ health_high }} important){% endif %}.{% else %}No suggestions right now.{% endif %}</p>
+      <div class="row"><a class="btn" href="{% url 'safety:plan' %}">Edit plan</a><a class="btn secondary" href="{% url 'safety:health' %}">Plan health</a></div>
+    </section>
+    <section class="card">
+      <h2>Safety Circle</h2>
+      <p>Choose who you trust and exactly what each person may do.</p>
+      <a class="btn secondary" href="{% url 'safety:circle' %}">Open circle</a>
+    </section>
+    <section class="card">
+      <h2>Guardian Mode</h2>
+      <p>Ask the people you authorised to acknowledge, with your backup ready.</p>
+      <a class="btn" href="{% url 'guardian:page' %}">Open Guardian Mode</a>
+    </section>
+    <section class="card">
+      <h2>SHIELD privacy check</h2>
+      <p>{{ shield_total }} item{{ shield_total|pluralize }} to look at{% if shield_high %} ({{ shield_high }} important){% endif %}.</p>
+      <a class="btn secondary" href="{% url 'shield:page' %}">Open SHIELD</a>
+    </section>
+    <section class="card">
+      <h2>Evidence Vault</h2>
+      <p>{{ incident_count }} incident record{{ incident_count|pluralize }}. Private and encrypted.</p>
+      <a class="btn secondary" href="{% url 'evidence:incidents' %}">Open vault</a>
+    </section>
+  </div>
+{% endif %}
+<h2>Community</h2>
+<div class="grid">
+  <section class="card">
+    <h3>Community safety feed</h3>
+    <p>Concerns that a moderator has checked for privacy. Not verified by LESEDI.</p>
+    <div class="row"><a class="btn secondary" href="{% url 'community:feed' %}">Open the feed</a><a class="btn secondary" href="{% url 'community:witness' %}">Worried about someone?</a></div>
+  </section>
+  {% if is_moderator %}
+  <section class="card">
+    <h3>Moderation</h3>
+    <p>Review reports and private concerns.</p>
+    <a class="btn" href="{% url 'community:mod_queue' %}">Open the queue</a>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

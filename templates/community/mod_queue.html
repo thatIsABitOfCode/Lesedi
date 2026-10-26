@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Moderation{% endblock %}
+{% block content %}
+<h1>Moderation</h1>
+<p class="notice">You can see community submissions only. This role gives no access to anyone's safety plan, circle, evidence, location or Guardian activity. Never copy private details into a public summary, an update or a note.</p>
+<p><a class="btn secondary" href="{% url 'community:mod_witness' %}">Witness concerns ({{ new_concerns }} new)</a></p>
+<h2>Needs a decision</h2>
+{% for r in needs_action %}
+<article class="card">
+  <h3><a href="{% url 'community:mod_report' r.pk %}">{{ r.get_category_display }}, {{ r.area }}</a></h3>
+  <p class="source">Sent {{ r.created_at|date:"j M Y H:i" }}. <span class="pill">{{ r.get_status_display }}</span>
+    {% if r.appealed_at %}<span class="pill">Appealed</span>{% endif %}
+    {% if r.possible_duplicate_of_id %}<span class="pill">Possible duplicate</span>{% endif %}
+    {% if r.open_flags %}<span class="pill">{{ r.open_flags }} flag{{ r.open_flags|pluralize }}</span>{% endif %}</p>
+</article>
+{% empty %}<p class="notice">Nothing is waiting.</p>{% endfor %}
+<h2>Published reports with open flags</h2>
+{% for r in flagged %}
+<article class="card">
+  <h3><a href="{% url 'community:mod_report' r.pk %}">{{ r.get_category_display }}, {{ r.area }}</a></h3>
+  <p class="source">{{ r.open_flags }} flag{{ r.open_flags|pluralize }} on the report, {{ r.open_comment_flags }} on comments.</p>
+</article>
+{% empty %}<p class="notice">No open flags.</p>{% endfor %}
+{% endblock %}

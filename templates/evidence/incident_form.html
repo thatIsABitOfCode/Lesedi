@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}New incident record{% endblock %}
+{% block content %}
+<h1>New incident record</h1>
+<p>This record is private to you. Write only what you want to. You can add notes and files afterwards.</p>
+<form method="post" novalidate>
+  {% csrf_token %}
+  {% include "partials/form_fields.html" %}
+  <button class="btn" type="submit">Create record</button>
+  <a class="btn secondary" href="{% url 'evidence:incidents' %}">Cancel</a>
+</form>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}{{ incident.title }}{% endblock %}
+{% block content %}
+<p><a href="{% url 'evidence:incidents' %}">&larr; Evidence Vault</a></p>
+<h1>{{ incident.title }}</h1>
+{% if incident.occurred_at %}<p class="source">Happened around {{ incident.occurred_at|date:"j M Y H:i" }} (as you entered it).</p>{% endif %}
+{% if incident.description %}<p>{{ incident.description|linebreaksbr }}</p>{% endif %}
+
+<section class="card">
+  <h2>Add a note</h2>
+  <form method="post" action="{% url 'evidence:note' incident.pk %}" novalidate>
+    {% csrf_token %}
+    {% include "partials/form_fields.html" with form=note_form %}
+    <button class="btn" type="submit">Save note</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Add a file</h2>
+  <p class="help">Photos (JPG, PNG), PDF or plain text. The file is checked, encrypted and stored privately. A fingerprint (SHA-256) is recorded so later changes to the stored copy can be noticed. A fingerprint does not prove a file is genuine.</p>
+  <form method="post" action="{% url 'evidence:upload' incident.pk %}" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    {% include "partials/form_fields.html" with form=upload_form %}
+    <button class="btn" type="submit">Store file</button>
+  </form>
+</section>
+
+<h2>Timeline</h2>
+<p class="help">Ordered by the time you said it happened. "Stored" is when LESEDI saved it, using the server clock. Neither time is independently verified.</p>
+
+<form id="export-form" method="post" action="{% url 'evidence:export' incident.pk %}">
+  {% csrf_token %}
+</form>
+
+{% for item in items %}
+<article class="card">
+  <h3>
+    <input type="checkbox" id="pick-{{ item.pk }}" name="item" value="{{ item.pk }}" form="export-form">
+    <label for="pick-{{ item.pk }}" class="inline">
+      {% if item.title %}{{ item.title }}{% elif item.kind == 'file' %}{{ item.original_filename }}{% else %}Note{% endif %}
+    </label>
+    <span class="pill low">{{ item.get_kind_display }}</span>
+  </h3>
+  <p class="source">Happened {{ item.event_time|date:"j M Y H:i" }} · Stored {{ item.uploaded_at|date:"j M Y H:i" }}</p>
+  {% if item.kind == 'note' %}
+    <p>{{ item.note_text|linebreaksbr }}</p>
+  {% else %}
+    <p>{{ item.original_filename }} · {{ item.size_bytes|filesizeformat }}</p>
+    <p><a class="btn secondary" href="{% url 'evidence:download' item.pk %}">Download</a></p>
+  {% endif %}
+  <p class="source">SHA-256 at storage: <code>{{ item.sha256 }}</code></p>
+
+  <details>
+    <summary>Share this record</summary>
+    <form method="post" action="{% url 'evidence:share' item.pk %}">
+      {% csrf_token %}
+      <div class="field">
+        <label for="label-{{ item.pk }}">Who is this for? (a label only you will see)</label>
+        <input id="label-{{ item.pk }}" name="recipient_label" type="text" maxlength="80" required>
+      </div>
+      <div class="field">
+        <label for="hours-{{ item.pk }}">Link works for (hours)</label>
+        <input id="hours-{{ item.pk }}" name="hours" type="number" min="1" max="336" value="24" required>
+      </div>
+      <button class="btn secondary" type="submit">Create share link</button>
+    </form>
+    <p class="help">Anyone who has the link can open this one record until it expires or you revoke it. Share links only to people you trust.</p>
+  </details>
+
+  {% for s in item.shares.all %}
+  <div class="row">
+    <span>Link for "{{ s.recipient_label }}":
+      {% if s.is_active %}<span class="pill ok">active until {{ s.expires_at|date:"j M H:i" }}</span>{% elif s.revoked_at %}<span class="pill low">revoked</span>{% else %}<span class="pill low">expired</span>{% endif %}
+      opened {{ s.access_count }} time{{ s.access_count|pluralize }}</span>
+    {% if s.is_active %}
+    <form method="post" action="{% url 'evidence:share_revoke' s.pk %}">
+      {% csrf_token %}
+      <button class="btn secondary" type="submit">Revoke</button>
+    </form>
+    {% endif %}
+  </div>
+  {% endfor %}
+
+  <details>
+    <summary>Delete this record</summary>
+    <form method="post" action="{% url 'evidence:delete' item.pk %}">
+      {% csrf_token %}
+      <p>This deletes the stored copy. Any share links stop working. It cannot be undone.</p>
+      <button class="btn danger" type="submit">Delete</button>
+    </form>
+  </details>
+</article>
+{% empty %}
+<p class="notice">Nothing here yet. Add a note or a file above.</p>
+{% endfor %}
+
+{% if items %}
+<section class="card">
+  <h2>Export an evidence pack</h2>
+  <p>Tick the records above that you want, then export. The pack contains those records, a timeline, fingerprints and a plain explanation of what they do and do not show. It contains no legal conclusions.</p>
+  <button class="btn" type="submit" form="export-form">Download selected as a ZIP</button>
+</section>
+{% endif %}
+
+<section class="card">
+  <h2>Who has accessed these records</h2>
+  <ul>
+    {% for e in access_events %}
+    <li>{{ e.created_at|date:"j M Y H:i" }}: {{ e.action }} ({{ e.item_label }}){% if e.via == 'share' %}, through a share link{% endif %}</li>
+    {% empty %}
+    <li>No activity yet.</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

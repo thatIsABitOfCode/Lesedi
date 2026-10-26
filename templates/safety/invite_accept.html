@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}An invitation{% endblock %}
+{% block content %}
+<h1>An invitation</h1>
+<p><strong>{{ inviter }}</strong> would like to list you as a trusted contact in their LESEDI safety plan.</p>
+<div class="card">
+  <h2>What this means</h2>
+  <ul>
+    <li>They entered your phone number or email address. LESEDI has not checked it.</li>
+    <li>If you accept, they may later ask you to look at a message and tell them you saw it.</li>
+    <li>You will only ever see what they chose to let you see.</li>
+    <li>You are not agreeing to travel anywhere or to take any risk. LESEDI does not contact the police or any emergency service.</li>
+    <li>They will be able to see whether you accepted or declined.</li>
+  </ul>
+</div>
+<form method="post">
+  {% csrf_token %}
+  <div class="row">
+    <button class="btn" type="submit" name="decision" value="accept">Accept</button>
+    <button class="btn secondary" type="submit" name="decision" value="decline">Decline</button>
+  </div>
+</form>
+{% endblock %}

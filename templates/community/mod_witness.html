@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Witness concerns{% endblock %}
+{% block content %}
+<p><a href="{% url 'community:mod_queue' %}">Back to the queue</a></p>
+<h1>Witness concerns</h1>
+<p class="notice">These are private. LESEDI has contacted nobody about them. Do not contact, name or confront the person a concern is about. A note you write is shown to the person who sent the concern, so keep it short and free of personal details. Only recommend support services you have checked yourself. If someone seems in immediate danger, follow your organisation's emergency procedure, which LESEDI does not provide.</p>
+{% for c in concerns %}
+<article class="card">
+  <h2>{{ c.get_about_display }}{% if c.area %}, {{ c.area }}{% endif %} {% if c.seems_urgent %}<span class="pill">Marked urgent by sender</span>{% endif %}</h2>
+  <p class="source">Received {{ c.created_at|date:"j M Y H:i" }}. <span class="pill">{{ c.get_status_display }}</span></p>
+  <p>{{ c.what_seen }}</p>
+  <form method="post" class="stack">
+    {% csrf_token %}
+    <input type="hidden" name="concern" value="{{ c.pk }}">
+    <label for="status-{{ c.pk }}">Status</label>
+    <select id="status-{{ c.pk }}" name="status"><option value="reviewed">Reviewed</option><option value="closed">Closed</option></select>
+    <label for="note-{{ c.pk }}">Note to the sender (optional)</label>
+    <textarea id="note-{{ c.pk }}" name="note" rows="2" maxlength="1000">{{ c.moderator_note }}</textarea>
+    <button class="btn" type="submit">Save</button>
+  </form>
+</article>
+{% empty %}<p class="notice">No open concerns.</p>{% endfor %}
+{% endblock %}

@@ -1,0 +1,12 @@
+Planned operations:
+community.0001_initial
+    Create model CommunityReport
+    Create model CommunityComment
+    Create model ContentFlag
+    Create model ModerationAction
+    Create model ReportUpdate
+    Create model WitnessConcern
+    Create index community_c_status_eadb5c_idx on field(s) status, published_at of model communityreport
+    Create constraint community_flag_exactly_one_target on model contentflag
+    Create constraint community_flag_once_per_report on model contentflag
+    Create constraint community_flag_once_per_comment on model contentflag

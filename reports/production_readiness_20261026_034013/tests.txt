@@ -1,0 +1,37 @@
+............................FF.......................................... [ 39%]
+........................................................................ [ 78%]
+.......................................                                  [100%]
+=================================== FAILURES ===================================
+____________ test_production_refuses_to_start_without_a_secret_key _____________
+
+    def test_production_refuses_to_start_without_a_secret_key():
+        result = _import_settings({"DJANGO_DEBUG": "0"})
+>       assert result.returncode != 0 and "DJANGO_SECRET_KEY" in result.stderr
+E       assert (0 != 0)
+E        +  where 0 = CompletedProcess(args=['/usr/local/bin/python', '-c', "import sys; sys.path.insert(0, '.'); import config.settings"], returncode=0, stdout='', stderr='').returncode
+
+tests/test_accounts_security.py:176: AssertionError
+_____ test_production_refuses_to_start_without_an_evidence_encryption_key ______
+
+    def test_production_refuses_to_start_without_an_evidence_encryption_key():
+        result = _import_settings({"DJANGO_DEBUG": "0", "DJANGO_SECRET_KEY": "x" * 60})
+>       assert result.returncode != 0 and "EVIDENCE_ENCRYPTION_KEYS" in result.stderr
+E       assert (0 != 0)
+E        +  where 0 = CompletedProcess(args=['/usr/local/bin/python', '-c', "import sys; sys.path.insert(0, '.'); import config.settings"], returncode=0, stdout='', stderr='').returncode
+
+tests/test_accounts_security.py:181: AssertionError
+=============================== warnings summary ===============================
+tests/test_accounts_security.py: 26 warnings
+tests/test_community.py: 21 warnings
+tests/test_demo_scenario.py: 1 warning
+tests/test_evidence.py: 6 warnings
+tests/test_guardian.py: 8 warnings
+tests/test_safety.py: 6 warnings
+tests/test_shield.py: 3 warnings
+  /usr/local/lib/python3.12/site-packages/django/core/handlers/base.py:61: UserWarning: No directory at: /app/staticfiles/
+    mw_instance = middleware(adapted_handler)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_accounts_security.py::test_production_refuses_to_start_without_a_secret_key
+FAILED tests/test_accounts_security.py::test_production_refuses_to_start_without_an_evidence_encryption_key

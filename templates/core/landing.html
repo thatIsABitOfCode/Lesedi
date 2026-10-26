@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Welcome{% endblock %}
+{% block content %}
+<section class="landing-hero"><div class="landing-copy"><span class="eyebrow">SAFETY · EVIDENCE · SUPPORT</span><h1>A safer tomorrow starts with you.</h1>
+<p>LESEDI helps you prepare, choose who you trust, decide exactly what each person may know, and keep notes and evidence privately. You stay in control of every step.</p>
+<div class="row">
+  <a class="btn" href="{% url 'accounts:register' %}">Create an account</a>
+  <a class="btn secondary" href="{% url 'accounts:login' %}">Log in</a>
+</div>
+</div></section><h2>Support that meets you where you are</h2><section class="card amani-feature"><span class="eyebrow">INTRODUCING AMANI</span><h2>A space to be heard.</h2><p>Human-first emotional support with continuity, private in-app listening rooms, and optional AI while you wait.</p><a class="btn secondary" href="{% url 'accounts:register' %}">Join Amani through LESEDI</a></section><h2>What you can do today</h2>
+<div class="grid">
+  <div class="card"><h3>Living Safety Plan</h3><p>Write your plan, choose a primary and backup responder, and see gentle suggestions to strengthen it.</p></div>
+  <div class="card"><h3>Safety Circle</h3><p>Invite people, give each one only the permissions you choose, and take them back at any time.</p></div>
+  <div class="card"><h3>Guardian Mode</h3><p>Notify the people you authorised, track who has acknowledged, and try your backup if the first person does not respond.</p></div>
+  <div class="card"><h3>Evidence Vault</h3><p>Keep dated notes and files encrypted and private. Export a pack only when you choose.</p></div>
+</div>
+<h2>What LESEDI cannot do</h2>
+<ul>
+  <li>It does not contact police or emergency services.</li>
+  <li>An acknowledgement means a person saw an alert, not that they are on their way.</li>
+  <li>It cannot find spyware or guarantee that a device is private.</li>
+  <li>This version is a development build: messages are simulated.</li>
+</ul>
+{% endblock %}

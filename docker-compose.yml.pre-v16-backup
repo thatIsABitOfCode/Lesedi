@@ -1,0 +1,57 @@
+# Local DEVELOPMENT stack. Not a production deployment.
+# Run as your own user so generated files are not owned by root:
+#   export LESEDI_UID=$(id -u) LESEDI_GID=$(id -g)
+x-app: &app
+  build: .
+  user: "${LESEDI_UID:-1000}:${LESEDI_GID:-1000}"
+  env_file: .env
+  environment:
+    HOME: /tmp
+  volumes:
+    - .:/app
+    - ./private_storage:/app/private_storage   # create first: mkdir -p private_storage
+  depends_on:
+    db:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-lesedi}
+      POSTGRES_USER: ${POSTGRES_USER:-lesedi}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-lesedi} -d ${POSTGRES_DB:-lesedi}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  web:
+    <<: *app
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "127.0.0.1:8000:8000"
+
+  worker:
+    <<: *app
+    command: celery -A config worker --loglevel=INFO
+
+  beat:
+    <<: *app
+    command: celery -A config beat --loglevel=INFO --schedule=/tmp/celerybeat-schedule
+
+volumes:
+  pg_data:

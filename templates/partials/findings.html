@@ -1,0 +1,10 @@
+{% for f in findings %}
+<article class="card">
+  <h3><span class="pill {{ f.severity }}">{{ f.severity|capfirst }}</span> {{ f.title }}</h3>
+  <p><strong>Why it matters:</strong> {{ f.why }}</p>
+  <p><strong>What you can do:</strong> {{ f.action }}</p>
+  <p class="source">Where this comes from: {{ f.source_label }}</p>
+</article>
+{% empty %}
+<p class="notice">Nothing to flag right now.</p>
+{% endfor %}

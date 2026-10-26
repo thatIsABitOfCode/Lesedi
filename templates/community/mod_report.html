@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Review report{% endblock %}
+{% block content %}
+<p><a href="{% url 'community:mod_queue' %}">Back to the queue</a></p>
+<h1>{{ report.get_category_display }}, {{ report.area }}</h1>
+<p class="source">Incident date {{ report.incident_date|date:"j M Y" }}. Sent {{ report.created_at|date:"j M Y H:i" }} by a registered user (identity is not shown here). <span class="pill">{{ report.get_status_display }}</span></p>
+
+<h2>What was reported (private)</h2>
+<p>{{ report.description }}</p>
+{% if report.is_sensitive %}<p class="notice">This kind of report can describe a specific person. Comments are closed, and the public summary must be rewritten, not copied.</p>{% endif %}
+{% if report.possible_duplicate_of_id %}<p class="notice">Possible duplicate of an earlier report: <a href="{% url 'community:mod_report' report.possible_duplicate_of_id %}">open it</a>.</p>{% endif %}
+{% for d in duplicates %}<p class="help">A later report may duplicate this one: <a href="{% url 'community:mod_report' d.pk %}">open it</a>.</p>{% endfor %}
+{% if report.appealed_at %}<h2>Appeal</h2><p>{{ report.appeal_text }}</p>{% endif %}
+{% if report.is_public %}<h2>Currently shown to the community</h2><p>{{ report.public_summary }}</p>{% endif %}
+
+<h2>Decision</h2>
+<form method="post" class="stack">
+  {% csrf_token %}
+  <input type="hidden" name="do" value="status">
+  {% include "partials/form.html" with form=status_form %}
+  <button class="btn" type="submit">Save decision</button>
+</form>
+<p class="help">Allowed moves: unreviewed to under review or rejected; under review to published or rejected; published to resolved, rejected or back under review; rejected back under review. There is deliberately no "confirmed" status: LESEDI has no verification process.</p>
+
+{% if report.is_public %}
+<h2>Add a public update or correction</h2>
+<form method="post" class="stack">
+  {% csrf_token %}
+  <input type="hidden" name="do" value="update">
+  {% include "partials/form.html" with form=update_form %}
+  <button class="btn secondary" type="submit">Add to the report</button>
+</form>
+{% endif %}
+
+{% if open_flags %}
+<h2>Open flags ({{ open_flags|length }})</h2>
+<ul>{% for f in open_flags %}<li>{{ f.get_reason_display }}</li>{% endfor %}</ul>
+<form method="post">{% csrf_token %}<input type="hidden" name="do" value="dismiss"><button class="btn secondary" type="submit">Dismiss all flags</button></form>
+{% endif %}
+
+<h2>Comments</h2>
+{% for c in comments %}
+<article class="card">
+  <p>{{ c.body }}</p>
+  <p class="source">{{ c.created_at|date:"j M Y H:i" }}{% if c.is_hidden %} <span class="pill">Hidden</span>{% endif %}</p>
+  {% if not c.is_hidden %}
+  <form method="post" class="row">{% csrf_token %}<input type="hidden" name="do" value="hide_comment"><input type="hidden" name="comment" value="{{ c.pk }}"><label class="sr-only" for="note-{{ c.pk }}">Note</label><input id="note-{{ c.pk }}" name="note" placeholder="Internal note"><button class="btn secondary" type="submit">Hide comment</button></form>
+  {% endif %}
+</article>
+{% empty %}<p class="notice">No comments.</p>{% endfor %}
+
+<h2>History</h2>
+<ul>{% for a in actions %}<li>{{ a.created_at|date:"j M Y H:i" }}: {{ a.action }}{% if a.note %} ({{ a.note }}){% endif %}</li>{% empty %}<li>No actions yet.</li>{% endfor %}</ul>
+{% endblock %}

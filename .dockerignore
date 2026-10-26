@@ -1,0 +1,11 @@
+.git
+.env
+.venv
+venv
+__pycache__
+*.pyc
+db.sqlite3
+private_storage
+.test_private_storage
+staticfiles
+_superseded

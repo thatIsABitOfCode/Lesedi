@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Account and privacy{% endblock %}
+{% block content %}
+<h1>Account and privacy</h1>
+
+<section class="card">
+  <h2>Your profile</h2>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% include "partials/form_fields.html" %}
+    <button class="btn" type="submit">Save profile</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Sign-in security</h2>
+  <p>Your account is protected by a password. Extra sign-in protection (multi-factor authentication) is not available in this version.</p>
+  <p>Changing your password signs you out of other devices.</p>
+  <a class="btn secondary" href="{% url 'accounts:password_change' %}">Change password</a>
+</section>
+
+<section class="card">
+  <h2>Notifications</h2>
+  <p>Messages LESEDI sends to your trusted contacts always use neutral wording. They never include your name, a location, an instruction or evidence. Details are only shown after the contact opens the link, and only if you allowed it.</p>
+</section>
+
+<section class="card">
+  <h2>Your data</h2>
+  <p>Download a copy of the information stored about you. Evidence file contents are not included; download those from the Evidence Vault.</p>
+  <a class="btn secondary" href="{% url 'accounts:export' %}">Download my data (JSON)</a>
+</section>
+
+<section class="card">
+  <h2>Delete my account</h2>
+  <p>This permanently deletes your plan, circle, Guardian records, incident records and stored evidence files. It cannot be undone. Some security records may be kept without your content, as the privacy policy will explain once it has been legally reviewed.</p>
+  <details>
+    <summary>I want to delete my account</summary>
+    <form method="post" action="{% url 'accounts:delete' %}" novalidate>
+      {% csrf_token %}
+      {% include "partials/form_fields.html" with form=delete_form %}
+      <button class="btn danger" type="submit">Permanently delete my account</button>
+    </form>
+  </details>
+</section>
+{% endblock %}

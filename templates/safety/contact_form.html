@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Add a person{% endblock %}
+{% block content %}
+<h1>Add a person to your circle</h1>
+<p>You are only saving their details. Nothing is sent to them and nothing is shared until you invite them and they accept. LESEDI does not verify these details, so please check them with the person yourself.</p>
+<form method="post" novalidate>
+  {% csrf_token %}
+  {% include "partials/form_fields.html" %}
+  <button class="btn" type="submit">Save person</button>
+  <a class="btn secondary" href="{% url 'safety:circle' %}">Cancel</a>
+</form>
+{% endblock %}

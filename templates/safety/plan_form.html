@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}My safety plan{% endblock %}
+{% block content %}
+<h1>My safety plan</h1>
+<p>Version {{ plan.version }}. Only you can see this page. Nothing here is shared unless you give a specific person a specific permission in your <a href="{% url 'safety:circle' %}">Safety Circle</a>.</p>
+<p class="notice">The safe destination is stored privately and is never put in a notification. Anyone who can log in as you could read it, so use a strong password and log out on shared devices.</p>
+<p><a class="btn secondary" href="{% url 'safety:health' %}">See plan health suggestions</a></p>
+<form method="post" novalidate>
+  {% csrf_token %}
+  {% include "partials/form_fields.html" %}
+  <button class="btn" type="submit">Save plan</button>
+</form>
+<h2>Earlier versions</h2>
+<p class="help">Each save creates a new version so you can see how your plan changed.</p>
+<ul>
+  {% for v in versions %}
+  <li>Version {{ v.version }}, saved {{ v.created_at|date:"j M Y H:i" }}</li>
+  {% empty %}
+  <li>No saved versions yet.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

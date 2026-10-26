@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Please wait · LESEDI{% endblock %}
+{% block content %}
+<h1>Too many attempts</h1>
+<p>Please wait a few minutes and try again. This limit protects accounts from being guessed.</p>
+<p><a href="{% url 'core:landing' %}">Back to the start</a></p>
+{% endblock %}

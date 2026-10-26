@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Report a concern{% endblock %}
+{% block content %}
+<h1>Report a concern</h1>
+<p class="notice"><strong>If someone is in immediate danger, contact your local emergency services.</strong> This form is not an emergency line and nobody is alerted when you send it.</p>
+<ul>
+  <li>A moderator reads your report first. Other people only ever see a short summary the moderator writes.</li>
+  <li>Your name is never shown to other users.</li>
+  <li>Do not include names, phone numbers, ID numbers, addresses or links. Describe the situation, not the person.</li>
+  <li>LESEDI does not verify reports and does not contact the police or anyone else about them.</li>
+</ul>
+<form method="post" class="stack">
+  {% csrf_token %}
+  {% include "partials/form.html" %}
+  <button class="btn" type="submit">Send for review</button>
+</form>
+<p class="help">Worried about one particular person? Use <a href="{% url 'community:witness' %}">the private form</a> instead. It is never published.</p>
+{% endblock %}

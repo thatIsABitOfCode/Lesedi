@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Community safety feed{% endblock %}
+{% block content %}
+<h1>Community safety feed</h1>
+<p class="notice">These are community-submitted concerns that a moderator has checked for privacy. <strong>LESEDI has not verified them.</strong> They are not proof that anything happened. Names, contact details and exact places are never shown. If someone is in immediate danger, contact your local emergency services.</p>
+<form method="get" class="row" role="search">
+  <label for="category" class="sr-only">Category</label>
+  <select id="category" name="category">
+    <option value="">All categories</option>
+    {% for value, label in categories %}<option value="{{ value }}"{% if value == category %} selected{% endif %}>{{ label }}</option>{% endfor %}
+  </select>
+  <label for="area" class="sr-only">Area</label>
+  <input id="area" name="area" type="search" value="{{ area }}" placeholder="Suburb, town or ward">
+  <button class="btn secondary" type="submit">Filter</button>
+</form>
+<div class="row">
+  <a class="btn" href="{% url 'community:report_new' %}">Report a concern</a>
+  <a class="btn secondary" href="{% url 'community:witness' %}">Tell us privately about someone</a>
+  <a class="btn secondary" href="{% url 'community:mine' %}">My reports</a>
+</div>
+{% for r in page %}
+<article class="card">
+  <h2><a href="{% url 'community:report' r.pk %}">{{ r.get_category_display }}</a></h2>
+  <p class="source">{{ r.area }}. Happened around {{ r.incident_date|date:"j M Y" }}. Shown since {{ r.published_at|date:"j M Y" }}. <span class="pill">{{ r.get_status_display }}</span></p>
+  <p>{{ r.public_summary }}</p>
+</article>
+{% empty %}
+<p class="notice">Nothing has been published{% if category or area %} for this filter{% endif %} yet.</p>
+{% endfor %}
+{% if page.has_other_pages %}
+<nav class="row" aria-label="Pages">
+  {% if page.has_previous %}<a class="btn secondary" href="?page={{ page.previous_page_number }}&amp;category={{ category|urlencode }}&amp;area={{ area|urlencode }}">Newer</a>{% endif %}
+  <span>Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+  {% if page.has_next %}<a class="btn secondary" href="?page={{ page.next_page_number }}&amp;category={{ category|urlencode }}&amp;area={{ area|urlencode }}">Older</a>{% endif %}
+</nav>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}{{ report.get_category_display }}{% endblock %}
+{% block content %}
+<p><a href="{% url 'community:feed' %}">Back to the feed</a></p>
+<h1>{{ report.get_category_display }}</h1>
+<p class="source">{{ report.area }}. Happened around {{ report.incident_date|date:"j M Y" }}. <span class="pill">{{ report.get_status_display }}</span></p>
+
+{% if report.is_public %}
+  <p class="notice">Community-submitted and checked by a moderator for privacy. <strong>LESEDI has not verified this.</strong></p>
+  <p>{{ report.public_summary }}</p>
+{% else %}
+  <p class="notice">Only you{% if is_mod and not is_author %} and moderators{% else %} and moderators{% endif %} can see this. Other people cannot.</p>
+  <p>{{ report.description }}</p>
+  {% if report.status == 'rejected' and report.decision_note %}<p><strong>Reason given:</strong> {{ report.decision_note }}</p>{% endif %}
+{% endif %}
+
+{% if is_mod %}<p><a class="btn secondary" href="{% url 'community:mod_report' report.pk %}">Open in moderation</a></p>{% endif %}
+
+{% if is_author and report.status == 'rejected' %}
+  {% if report.appealed_at %}
+    <p class="notice">You appealed on {{ report.appealed_at|date:"j M Y" }}. A moderator will look at it again.</p>
+  {% else %}
+    <h2>Appeal this decision</h2>
+    <form method="post" action="{% url 'community:appeal' report.pk %}" class="stack">
+      {% csrf_token %}
+      {% include "partials/form.html" with form=appeal_form %}
+      <button class="btn secondary" type="submit">Send appeal</button>
+    </form>
+  {% endif %}
+{% endif %}
+
+{% if updates %}
+<h2>Updates and corrections</h2>
+{% for u in updates %}<article class="card"><p class="source"><span class="pill">{{ u.get_kind_display }}</span> {{ u.created_at|date:"j M Y" }}</p><p>{{ u.body }}</p></article>{% endfor %}
+{% endif %}
+
+{% if report.is_public %}
+<h2>Comments</h2>
+{% if commenting_open %}
+  {% for c in comments %}
+  <article class="card">
+    <p>{{ c.body }}</p>
+    <p class="source">{{ c.created_at|date:"j M Y H:i" }}</p>
+    <form method="post" action="{% url 'community:flag_comment' c.pk %}" class="row">
+      {% csrf_token %}
+      <label class="sr-only" for="reason-{{ c.pk }}">Reason</label>
+      <select id="reason-{{ c.pk }}" name="reason">{% for v, l in flag_form.fields.reason.choices %}<option value="{{ v }}">{{ l }}</option>{% endfor %}</select>
+      <button class="btn secondary" type="submit">Flag this comment</button>
+    </form>
+  </article>
+  {% empty %}<p class="notice">No comments yet.</p>{% endfor %}
+  <form method="post" action="{% url 'community:comment' report.pk %}" class="stack">
+    {% csrf_token %}
+    {% include "partials/form.html" with form=comment_form %}
+    <button class="btn" type="submit">Add comment</button>
+  </form>
+{% else %}
+  <p class="notice">Comments are closed on this kind of report to protect the people involved.</p>
+{% endif %}
+
+<h2>Something wrong with this report?</h2>
+<form method="post" action="{% url 'community:flag' report.pk %}" class="row">
+  {% csrf_token %}
+  <label class="sr-only" for="flag-reason">Reason</label>
+  <select id="flag-reason" name="reason">{% for v, l in flag_form.fields.reason.choices %}<option value="{{ v }}">{{ l }}</option>{% endfor %}</select>
+  <button class="btn secondary" type="submit">Flag for a moderator</button>
+</form>
+{% endif %}
+{% endblock %}

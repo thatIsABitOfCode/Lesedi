@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}{{ contact.name }}{% endblock %}
+{% block content %}
+<p><a href="{% url 'safety:circle' %}">&larr; Safety Circle</a></p>
+<h1>{{ contact.name }} <span class="pill {% if contact.status == 'active' %}ok{% else %}low{% endif %}">{{ contact.get_status_display }}</span></h1>
+<p>These details are what you entered. LESEDI has not verified them.</p>
+<dl>
+  {% if contact.relationship %}<dt>Relationship</dt><dd>{{ contact.relationship }}</dd>{% endif %}
+  {% if contact.phone %}<dt>Phone</dt><dd>{{ contact.phone }}</dd>{% endif %}
+  {% if contact.email %}<dt>Email</dt><dd>{{ contact.email }}</dd>{% endif %}
+  <dt>Preferred channel</dt><dd>{{ contact.get_preferred_channel_display }}</dd>
+</dl>
+
+<section class="card">
+  <h2>1. Invitation</h2>
+  {% if contact.status == 'active' %}
+    <p>{{ contact.name }} accepted{% if contact.consented_at %} on {{ contact.consented_at|date:"j M Y" }}{% endif %}.</p>
+  {% elif contact.status == 'revoked' %}
+    <p>This person was removed.</p>
+  {% else %}
+    <p>They must accept before they can be a responder or receive anything from you.</p>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="invite">
+      <button class="btn" type="submit">Create invitation link</button>
+    </form>
+  {% endif %}
+  {% if invite_link %}
+    <p class="notice sim">SIMULATION: no message was sent. Copy this link and give it to {{ contact.name }} yourself. It works once and expires in 7 days.</p>
+    <p class="linkbox"><code>{{ invite_link }}</code></p>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>2. Confirm their details</h2>
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="confirm_details">
+    <div class="check">
+      <input type="checkbox" id="confirmed" name="confirmed"{% if contact.owner_confirmed_details %} checked{% endif %}>
+      <label for="confirmed">I have confirmed these contact details with {{ contact.name }} myself</label>
+    </div>
+    <p class="help">This is your own statement. LESEDI cannot check it.</p>
+    <button class="btn secondary" type="submit">Save</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>3. What {{ contact.name }} may do</h2>
+  <p>Nothing is allowed by default. Tick only what you want.</p>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <input type="hidden" name="action" value="permissions">
+    {% include "partials/form_fields.html" with form=perm_form %}
+    <button class="btn" type="submit">Save permissions</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>4. Position in your responder order</h2>
+  {% if contact.status != 'active' %}
+    <p>Available once {{ contact.name }} has accepted your invitation.</p>
+  {% else %}
+    {% if assignment %}
+      <p>Currently: <strong>{% if assignment.rank == 1 %}primary responder{% elif assignment.rank == 2 %}first backup{% else %}backup {{ assignment.rank|add:"-1" }}{% endif %}</strong>.</p>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="unassign">
+        <button class="btn secondary" type="submit">Take them out of the order</button>
+      </form>
+      <p class="help">Taking someone out of the order does not remove their permissions. Change those above.</p>
+    {% else %}
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="action" value="assign">
+        {% include "partials/form_fields.html" with form=assign_form %}
+        <button class="btn" type="submit">Give this position</button>
+      </form>
+    {% endif %}
+  {% endif %}
+</section>
+
+{% if contact.status != 'revoked' %}
+<section class="card">
+  <h2>Remove {{ contact.name }}</h2>
+  <details>
+    <summary>I want to remove this person</summary>
+    <p>All their permissions are revoked and they are taken out of your responder order. Links already sent to them stop working.</p>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="revoke">
+      <button class="btn danger" type="submit">Remove {{ contact.name }}</button>
+    </form>
+  </details>
+</section>
+{% endif %}
+{% endblock %}

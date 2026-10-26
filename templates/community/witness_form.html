@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Worried about someone{% endblock %}
+{% block content %}
+<h1>Worried about someone?</h1>
+<p class="notice"><strong>If someone is in immediate danger, contact your local emergency services now.</strong> This form is not an emergency line.</p>
+<h2>What happens when you send this</h2>
+<ul>
+  <li>Only moderators and you can see it. It is never published and never appears in the community feed.</li>
+  <li>LESEDI does <strong>not</strong> contact the person you are worried about, anyone close to them, the police or any other authority.</li>
+  <li>It gives you no access to their account, location, evidence or plans, and gives them no sign that you wrote.</li>
+  <li>A moderator may add a short note, for example a pointer to support services. You can read it under "My reports". Nobody promises a response time.</li>
+</ul>
+<form method="post" class="stack">
+  {% csrf_token %}
+  {% include "partials/form.html" %}
+  <button class="btn" type="submit">Send privately</button>
+</form>
+<p class="help">Only give details a moderator really needs. Please do not confront the person or share your concern with them: it may put them at greater risk.</p>
+{% endblock %}

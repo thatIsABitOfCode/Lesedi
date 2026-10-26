@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Evidence Vault{% endblock %}
+{% block content %}
+<h1>Evidence Vault</h1>
+<p>Private records of what happened, with dated notes and files. Files are encrypted before they are stored and are never in a public folder. Only you can open them unless you create a share link.</p>
+<form method="get" class="row" role="search">
+  <label for="q" class="sr-only">Search</label>
+  <input id="q" name="q" type="search" value="{{ q }}" placeholder="Search titles, notes and file names">
+  <button class="btn secondary" type="submit">Search</button>
+</form>
+<p class="help">Search covers titles, descriptions, notes and file names. It does not look inside files.</p>
+<p><a class="btn" href="{% url 'evidence:incident_new' %}">New incident record</a></p>
+{% for i in incidents %}
+<article class="card">
+  <h2><a href="{% url 'evidence:incident' i.pk %}">{{ i.title }}</a></h2>
+  <p class="source">{% if i.occurred_at %}Happened around {{ i.occurred_at|date:"j M Y H:i" }}. {% endif %}Created {{ i.created_at|date:"j M Y" }}.</p>
+</article>
+{% empty %}
+<p class="notice">{% if q %}Nothing matched your search.{% else %}No incident records yet. Create one when you are ready.{% endif %}</p>
+{% endfor %}
+{% endblock %}

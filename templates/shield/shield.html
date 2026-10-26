@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}SHIELD privacy check{% endblock %}
+{% block content %}
+<h1>SHIELD privacy check</h1>
+<p class="notice">{{ limits }}</p>
+<section class="card">
+  <h2>Tell us about your situation</h2>
+  <p>These answers stay private. Tick whatever is true for you. You can change them whenever things change.</p>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% include "partials/form_fields.html" %}
+    <button class="btn" type="submit">Save my answers</button>
+  </form>
+</section>
+<h2>What we noticed</h2>
+<p class="help">Each item says whether it came from your answers, from your LESEDI settings, or from a fact LESEDI checked itself.</p>
+{% include "partials/findings.html" %}
+{% endblock %}

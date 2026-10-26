@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Thank you{% endblock %}
+{% block content %}
+{% if accepted %}
+<h1>Thank you</h1>
+<p>You accepted. You may be sent a link later. You do not need an account.</p>
+{% else %}
+<h1>Understood</h1>
+<p>You declined. Nothing further will be sent to you through this invitation.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,41 @@
+accounts
+ [X] 0001_initial
+admin
+ [X] 0001_initial
+ [X] 0002_logentry_remove_auto_add
+ [X] 0003_logentry_add_action_flag_choices
+amani
+ [X] 0001_initial
+audit
+ [X] 0001_initial
+auth
+ [X] 0001_initial
+ [X] 0002_alter_permission_name_max_length
+ [X] 0003_alter_user_email_max_length
+ [X] 0004_alter_user_username_opts
+ [X] 0005_alter_user_last_login_null
+ [X] 0006_require_contenttypes_0002
+ [X] 0007_alter_validators_add_error_messages
+ [X] 0008_alter_user_username_max_length
+ [X] 0009_alter_user_last_name_max_length
+ [X] 0010_alter_group_name_max_length
+ [X] 0011_update_proxy_permissions
+ [X] 0012_alter_user_first_name_max_length
+community
+ [X] 0001_initial
+contenttypes
+ [X] 0001_initial
+ [X] 0002_remove_content_type_name
+evidence
+ [X] 0001_initial
+guardian
+ [X] 0001_initial
+ [X] 0002_guardianactivation_location_accuracy_m_and_more
+notifications
+ [X] 0001_initial
+safety
+ [X] 0001_initial
+sessions
+ [X] 0001_initial
+shield
+ [X] 0001_initial

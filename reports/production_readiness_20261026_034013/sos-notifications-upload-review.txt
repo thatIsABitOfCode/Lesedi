@@ -1,0 +1,41 @@
+/app/guardian/tasks.py:1:from celery import shared_task
+/app/guardian/tasks.py:8:    """Run by Celery beat every 15 seconds. Escalates activations whose acknowledgement deadline passed."""
+/app/guardian/services.py:31:SIM_NOTICE = ("SIMULATION: no real SMS, WhatsApp message or call was made, no emergency service was "
+/app/guardian/services.py:60:    prefix = "[SIMULATION] " if (simulated and a.is_simulation) else ""
+/app/guardian/services.py:118:    simulation = settings.LESEDI_NOTIFICATION_MODE == "simulation"
+/app/guardian/services.py:123:                idempotency_key=idempotency_key, is_simulation=simulation,
+/app/guardian/services.py:124:                simulate_primary_failure=bool(simulate_primary_failure and simulation),
+/app/guardian/services.py:133:            record("guardian.activated", actor=owner, obj=a, metadata={"mode": "simulation" if simulation else "live"})
+/app/guardian/services.py:226:    """Escalate every activation whose acknowledgement deadline has passed. Called by Celery beat; also
+/app/guardian/services.py:316:    """SIMULATION ONLY: pretend the acknowledgement deadline has passed, then run the real escalation code."""
+/app/guardian/services.py:320:        if not a.is_simulation:
+/app/guardian/services.py:321:            raise GuardianError("Time can only be advanced in simulation mode.")
+/app/guardian/models.py:17:    is_simulation = models.BooleanField(default=True)
+/app/guardian/views.py:7:from safety.services import get_or_create_plan, has_permission
+/app/guardian/views.py:15:    plan = get_or_create_plan(request.user)
+/app/guardian/views.py:21:def sos_page(request):
+/app/guardian/views.py:25:    plan = get_or_create_plan(request.user)
+/app/guardian/views.py:45:           "is_simulation": activation.is_simulation, "token": token, "done": False, "error": ""}
+/app/guardian/migrations/0001_initial.py:46:                ("is_simulation", models.BooleanField(default=True)),
+/app/guardian/api.py:44:        "is_simulation": a.is_simulation,
+/app/guardian/api.py:45:        "notice": services.SIM_NOTICE if a.is_simulation else "",
+/app/core/management/commands/seed_demo.py:10:    help = "Create the fictional Naledi / Faith / Mapaseka demo data (simulation mode only)."
+/app/core/management/commands/seed_demo.py:16:        if settings.LESEDI_NOTIFICATION_MODE != "simulation":
+/app/core/management/commands/seed_demo.py:17:            raise CommandError("Demo data can only be created in simulation mode.")
+/app/core/management/commands/seed_demo.py:22:        self.stdout.write(self.style.SUCCESS("Demo data ready (fictional people, simulation only)."))
+/app/core/context_processors.py:6:        "SIMULATION_MODE": settings.LESEDI_NOTIFICATION_MODE == "simulation",
+/app/core/ratelimit.py:1:"""Small fixed-window rate limiter on the Django cache (Redis in compose, locmem in tests).
+/app/core/demo.py:34:    plan = safety.get_or_create_plan(naledi)
+/app/core/views.py:13:from safety.services import get_or_create_plan
+/app/core/views.py:26:        plan = get_or_create_plan(request.user)
+/app/templates/safety/contact_detail.html:29:    <p class="notice sim">SIMULATION: no message was sent. Copy this link and give it to {{ contact.name }} yourself. It works once and expires in 7 days.</p>
+/app/templates/guardian/guardian.html:6:{% if SIMULATION_MODE %}<p class="notice sim">{{ sim_notice }}</p>{% endif %}
+/app/templates/guardian/guardian.html:29:      {% if SIMULATION_MODE %}
+/app/templates/guardian/sos.html:6:  {% if SIMULATION_MODE %}<p class="notice sim">{{ sim_notice }}</p>{% endif %}
+/app/templates/guardian/sos.html:10:  {% if not responders %}<p class="error" role="alert">No responders are configured. Set up your Safety Circle before relying on this feature.</p>{% endif %}
+/app/templates/guardian/sos.html:76:      document.getElementById("sos-result-title").textContent = data.is_simulation ? "Simulation activation started" : "Guardian activation started";
+/app/templates/guardian/sos.html:79:      setStatus(data.is_simulation ? "Simulation mode: no real messages or emergency dispatch occurred." : "Guardian response activation recorded. Check status and delivery outcomes below.");
+/app/templates/guardian/sos.html:80:      if (data.is_simulation) resultText.textContent += " SIMULATION MODE: no real messages were sent.";
+/app/templates/guardian/ack.html:5:{% if is_simulation %}
+/app/templates/guardian/ack.html:6:<p class="notice sim">SIMULATION: this is a demonstration. Nothing real was sent and nobody is in danger.</p>
+/app/templates/base.html:16:{% if SIMULATION_MODE %}<div class="banner sim" role="status">SIMULATION MODE: no real messages are sent and no emergency service is ever contacted.</div>{% endif %}

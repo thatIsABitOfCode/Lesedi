@@ -1,0 +1,9 @@
+{
+  "name": "LESEDI",
+  "short_name": "LESEDI",
+  "start_url": "/dashboard/",
+  "display": "standalone",
+  "background_color": "#faf6fd",
+  "theme_color": "#75468e",
+  "icons": [{ "src": "/static/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

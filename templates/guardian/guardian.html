@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Guardian Mode{% endblock %}
+{% block content %}
+<h1>Guardian Mode</h1>
+{% if SIMULATION_MODE %}<p class="notice sim">{{ sim_notice }}</p>{% endif %}
+<p class="notice">{{ limits }}</p>
+
+<section class="card">
+  <h2>Who would be asked</h2>
+  <ol>
+    {% for r in responders %}
+    <li>{{ r.contact.name }} ({% if r.rank == 1 %}primary{% else %}backup{% endif %}), {{ r.contact.get_status_display|lower }}</li>
+    {% empty %}
+    <li>Nobody yet. Guardian Mode has nobody to ask until you choose a responder in your <a href="{% url 'safety:circle' %}">Safety Circle</a>.</li>
+    {% endfor %}
+  </ol>
+  <p>If a person does not acknowledge within {{ plan.ack_timeout_seconds }} seconds, the next person is tried. Only people who accepted your invitation and hold the "receive an emergency alert" permission are contacted. Check <a href="{% url 'safety:health' %}">plan health</a> to see anything that might stop this working.</p>
+</section>
+
+<div id="guardian-app" data-api-base="/api/guardian/">
+  <noscript><p class="notice">This page needs JavaScript to show live status. If you are in danger, contact your local emergency services directly.</p></noscript>
+
+  <section id="g-start" class="card">
+    <h2>Start</h2>
+    <button id="g-begin" class="btn big" type="button">Start Guardian Mode</button>
+    <div id="g-confirm" hidden>
+      <p><strong>Start Guardian Mode now?</strong> The people above will be asked to acknowledge. You can cancel or end it at any time.</p>
+      {% if SIMULATION_MODE %}
+      <div class="check">
+        <input type="checkbox" id="g-fail">
+        <label for="g-fail">Demo: make the first responder's notification fail</label>
+      </div>
+      {% endif %}
+      <div class="row">
+        <button id="g-yes" class="btn big danger" type="button">Yes, start</button>
+        <button id="g-no" class="btn secondary" type="button">Not now</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="g-panel" class="card" hidden>
+    <h2>Status: <span id="g-state"></span></h2>
+    <p id="g-notice" class="notice sim" hidden></p>
+    <p id="g-deadline"></p>
+
+    <h3>Steps</h3>
+    <ol id="g-steps"></ol>
+
+    <h3>Notifications</h3>
+    <p class="help">"Submitted" means it was handed to the sender. It does not mean it arrived, and arriving does not mean the person saw it.</p>
+    <ul id="g-deliveries"></ul>
+
+    <h3>Acknowledgements</h3>
+    <ul id="g-acks"></ul>
+
+    <h3>Timeline</h3>
+    <ol id="g-timeline" class="timeline"></ol>
+
+    <div class="row">
+      <button id="g-resolve" class="btn" type="button" hidden>Mark as resolved</button>
+      <button id="g-cancel" class="btn secondary" type="button" hidden>Cancel Guardian Mode</button>
+      <button id="g-skip" class="btn secondary" type="button" hidden>Demo: skip the waiting time</button>
+    </div>
+  </section>
+
+  <p id="g-status-msg" role="status" aria-live="polite"></p>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/guardian.js' %}" defer></script>{% endblock %}

@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}SOS Emergency Mode{% endblock %}
+{% block content %}
+<section class="card sos-page" aria-labelledby="sos-title">
+  <h1 id="sos-title">Emergency Mode</h1>
+  {% if SIMULATION_MODE %}<p class="notice sim">{{ sim_notice }}</p>{% endif %}
+  <p class="notice">{{ limits }}</p>
+  <p>Press SOS to start your saved Guardian response plan. If you allow location access, your current coordinates will be attached to this activation and shown to authorised alert recipients through their secure response link.</p>
+  <p><strong>Responders configured:</strong> {{ responders|length }}</p>
+  {% if not responders %}<p class="error" role="alert">No responders are configured. Set up your Safety Circle before relying on this feature.</p>{% endif %}
+  <button id="lesedi-sos-button" class="btn big danger sos-button" type="button" {% if not responders %}disabled{% endif %} aria-describedby="sos-status">SOS — Activate Emergency Mode</button>
+  <p id="sos-status" role="status" aria-live="polite">Ready. Press SOS only when you want to activate your saved response plan.</p>
+  <section id="sos-result" class="card" hidden aria-live="polite">
+    <h2 id="sos-result-title">Emergency status</h2>
+    <p id="sos-result-text"></p>
+    <p id="sos-location-text"></p>
+    <p><a href="{% url 'guardian:page' %}">Open full Guardian status</a></p>
+  </section>
+  <p class="help">This button does not contact police or emergency services. No such dispatch integration is configured by this feature. If you are in immediate danger, contact local emergency services directly. If location permission is denied or GPS fails, Guardian Mode can still activate without location.</p>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+(() => {
+  "use strict";
+  const button = document.getElementById("lesedi-sos-button");
+  const statusNode = document.getElementById("sos-status");
+  const result = document.getElementById("sos-result");
+  const resultText = document.getElementById("sos-result-text");
+  const locationText = document.getElementById("sos-location-text");
+  const csrf = document.querySelector('meta[name="csrf-token"]')?.content || "";
+  let inFlight = false;
+  const idempotencyKey = () => {
+    try {
+      const key = window.crypto?.randomUUID?.();
+      return key || (`sos-${Date.now()}-${Math.random().toString(16).slice(2)}`);
+    } catch (_) { return `sos-${Date.now()}`; }
+  };
+  function setStatus(message) { statusNode.textContent = message; }
+  function getLocation() {
+    return new Promise(resolve => {
+      if (!navigator.geolocation) return resolve(null);
+      navigator.geolocation.getCurrentPosition(
+        pos => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude, accuracy_m: pos.coords.accuracy }),
+        () => resolve(null),
+        { enableHighAccuracy: true, timeout: 7000, maximumAge: 60000 }
+      );
+    });
+  }
+  button?.addEventListener("click", async () => {
+    if (inFlight) return;
+    inFlight = true;
+    button.disabled = true;
+    result.hidden = true;
+    setStatus("Requesting location permission. Emergency activation will continue if location is unavailable…");
+    try {
+      const location = await getLocation();
+      setStatus("Activating your saved Guardian response plan…");
+      const payload = { idempotency_key: idempotencyKey() };
+      if (location) Object.assign(payload, location);
+      const response = await fetch("/api/guardian/activate/", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": csrf, "Accept": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      let data = {};
+      try { data = await response.json(); } catch (_) { /* handle non-JSON error below */ }
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          throw new Error("Your session may have expired or this account is not permitted to activate SOS. Sign in and try again when safe.");
+        }
+        throw new Error(data.detail || `Activation failed (HTTP ${response.status}). Check your Safety Plan and Guardian setup.`);
+      }
+      result.hidden = false;
+      document.getElementById("sos-result-title").textContent = data.is_simulation ? "Simulation activation started" : "Guardian activation started";
+      resultText.textContent = `Status: ${data.state_label || data.state || "Activation recorded"}. Notification submission is not proof of delivery or that help is on the way.`;
+      locationText.textContent = data.location ? `Location captured (accuracy approximately ${Math.round(data.location.accuracy_m || 0)} m). It is available to authorised alert recipients.` : "Location was not captured. Guardian activation may still have started; share your location another way if it is safe to do so.";
+      setStatus(data.is_simulation ? "Simulation mode: no real messages or emergency dispatch occurred." : "Guardian response activation recorded. Check status and delivery outcomes below.");
+      if (data.is_simulation) resultText.textContent += " SIMULATION MODE: no real messages were sent.";
+    } catch (err) {
+      setStatus(err instanceof Error ? err.message : "Unexpected error. Check the Guardian page before retrying to avoid duplicate alerts.");
+    } finally {
+      inFlight = false;
+      button.disabled = false;
+    }
+  });
+})();
+</script>
+<style>
+.sos-page { max-width: 760px; margin: 1.5rem auto; }
+.sos-button { display: block; width: min(100%, 460px); min-height: 92px; margin: 1.5rem auto; border-radius: 1rem; font-size: 1.25rem; font-weight: 800; background: #b91c1c; color: #fff; border: 3px solid #7f1d1d; }
+.sos-button:focus-visible { outline: 4px solid #1d4ed8; outline-offset: 4px; }
+.sos-button:disabled { opacity: .55; cursor: not-allowed; }
+</style>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Plan health{% endblock %}
+{% block content %}
+<h1>Plan health</h1>
+<p>These are gentle suggestions to make your plan more reliable. They are not a judgement of you or the people you chose.</p>
+<p class="notice">Each item says where it comes from. "You told us" means you entered it and LESEDI cannot confirm it. LESEDI does not check whether anyone is trustworthy, and it cannot confirm that a phone number or email really belongs to the person you named.</p>
+{% include "partials/findings.html" %}
+<div class="row">
+  <a class="btn" href="{% url 'safety:plan' %}">Edit plan</a>
+  <a class="btn secondary" href="{% url 'safety:circle' %}">Safety Circle</a>
+</div>
+{% endblock %}

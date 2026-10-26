@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Safety Circle{% endblock %}
+{% block content %}
+<h1>Safety Circle</h1>
+<p>These are people you chose. Adding someone shares nothing. They must accept an invitation, and then you decide exactly what each person may do. You can take any permission back at any time.</p>
+
+<section class="card">
+  <h2>Responder order</h2>
+  <p class="help">Guardian Mode asks the first person, then moves to the next if nobody acknowledges in time.</p>
+  <ol>
+    {% for r in responders %}
+    <li>
+      {% if r.rank == 1 %}Primary responder{% elif r.rank == 2 %}First backup{% else %}Backup {{ r.rank|add:"-1" }}{% endif %}:
+      <a href="{% url 'safety:contact' r.contact.pk %}">{{ r.contact.name }}</a>
+    </li>
+    {% empty %}
+    <li>Nobody has been placed in your responder order yet. Open a person below, and once they have accepted, give them a position.</li>
+    {% endfor %}
+  </ol>
+</section>
+
+<h2>People in your circle</h2>
+{% for c in contacts %}
+<article class="card">
+  <h3><a href="{% url 'safety:contact' c.pk %}">{{ c.name }}</a>
+    <span class="pill {% if c.status == 'active' %}ok{% else %}low{% endif %}">{{ c.get_status_display }}</span></h3>
+  <p>{% if c.relationship %}{{ c.relationship }}. {% endif %}Preferred channel: {{ c.get_preferred_channel_display }}.</p>
+  {% if not c.owner_confirmed_details %}<p class="source">You have not marked their contact details as confirmed.</p>{% endif %}
+</article>
+{% empty %}
+<p class="notice">Your circle is empty. Add someone you trust to get started.</p>
+{% endfor %}
+<a class="btn" href="{% url 'safety:contact_add' %}">Add a person</a>
+{% endblock %}
